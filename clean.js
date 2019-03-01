@@ -1,17 +1,14 @@
-const sox = require('./sox')
-
-const fs = require('fs-extra')
 const path = require('path')
-
+const fs = require('fs-extra')
+const sox = require('./sox')
 const timeWizard = require('./time-wizard')
 
 // sox $in noise-$name.wav trim $noise_start $noise_end
 // sox noise-$name.wav -n noiseprof $name-noise.prof
 // sox $in $out noisered $name-noise.prof 0.21 compand 0.1,0.3 -60,-60,-30,-15,-20,-12,-4,-8,-2,-7 -2 norm -3 highpass 10
+
 // sox $name.wav $name-end.wav trim 0 $end
 // sox $name-end.wav $name-clipped.wav trim $clap
-
-// there is a complete clean audio file
 
 const getNoise = async (audio, name, start, end) => sox(`${audio} noise-${name}.wav trim ${start} ${end - start}`)
 const getNoiseProfile = async (name) => sox(`noise-${name}.wav -n noiseprof ${name}-noise.prof`)
@@ -38,6 +35,4 @@ const clean = async () => {
 }
 // main()
 
-module.exports = {
-  getNoise
-}
+module.exports = clean
