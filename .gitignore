@@ -1,2 +1,6 @@
-episode
-sfx
+data
+node_modules
+.vscode
+*.wav
+*.mp3
+*.prof
