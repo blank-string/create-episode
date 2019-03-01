@@ -18,6 +18,8 @@ test('toTime', () => {
 })
 
 test('diff', () => {
-  const output = timeWizard.diff('1:01:01', '2:03:04')
+  let output = timeWizard.diff('1:01:01', '2:03:04')
+  expect(output).toEqual(3723)
+  output = timeWizard.diff('2:03:04', '1:01:01')
   expect(output).toEqual(3723)
 })

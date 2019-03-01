@@ -30,7 +30,11 @@ const toTime = (seconds) => {
 const diff = (left, right) => {
   left = obj(left)
   right = obj(right)
-  if (right.total < left.total) throw new Error('the second value should be larger than the first when diffing', left, right)
+  let tmp = right
+  if (right.total < left.total) {
+    right = left
+    left = tmp
+  }
   return right.total - left.total
 }
 
