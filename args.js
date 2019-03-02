@@ -53,5 +53,9 @@ const meta = fs.readdirSync(metaDir)
   .map(filename => path.join(metaDir, filename))
   .filter(filename => filename.includes('.json'))
   .map(filename => require(filename))
+  .map(d => {
+    d.file = path.join(metaDir, d.file)
+    return d
+  })
 
 module.exports = meta
