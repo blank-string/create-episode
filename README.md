@@ -52,3 +52,26 @@ where `luke.json` looks like this
 
 If you use the podcaster app this json file is created alongside your audio file
 The `audio` folder has all your sound effects and clips you wish to use and get merged with your episode in the final cut
+
+## To Do
+
+audio times, start and end to be reduced by sync
+
+cut all to sync and merge
+
+pick shortest start and longest end or start = 0, end = length and trim
+
+change all audio times by this start
+
+pad all audio tracks using their time
+
+merge all audio tracks which do not have insert
+
+then pad the merged one with any inserts
+
+pad any remaining ones
+
+merge remaining tracks
+
+normalize
+

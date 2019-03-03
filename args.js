@@ -58,4 +58,8 @@ const meta = fs.readdirSync(metaDir)
     return d
   })
 
-module.exports = meta
+module.exports = {
+  name,
+  dataDir,
+  meta
+}

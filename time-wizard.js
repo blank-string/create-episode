@@ -1,6 +1,6 @@
-const obj = (time) => {
-  time = '' + time
-  let match = time.split(':')
+const obj = (input) => {
+  const time = toTime(parseInt(input, 10))
+  let match = time.trim().split(':')
   if (match.length === 2) match = ['00'].concat(match)
   if (match.length === 1) match = ['00', '00'].concat(match)
   const hours = parseInt(match[0], 10)

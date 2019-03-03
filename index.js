@@ -1,12 +1,21 @@
 const fs = require('fs-extra')
 const path = require('path')
-const meta = require('./args')
+const { name, dataDir, meta } = require('./args')
 const clean = require('./clean')
+const merge = require('./merge')
 
-const tmp = path.resolve(__dirname, 'tmp')
-if (fs.existsSync(tmp)) fs.removeSync(tmp)
-fs.mkdirSync(tmp)
+const createTmp = () => {
+  const tmp = path.resolve(__dirname, 'tmp')
+  if (fs.existsSync(tmp)) fs.removeSync(tmp)
+  fs.mkdirSync(tmp)
+  return tmp
+}
 
-meta.slice(0, 1).forEach(async ({ name, file, noise }) => {
-  await clean(tmp, { name, file, noise })
-})
+const main = async () => {
+  const tmp = createTmp()
+  await Promise.all(meta.map(({ name, file, noise, sync }) => clean(tmp, { name, file, noise, sync })))
+  await merge(tmp, name, dataDir, meta)
+  fs.removeSync(tmp)
+}
+
+main()
