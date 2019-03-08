@@ -12,6 +12,10 @@ const args = yargs
     alias: 'd',
     describe: 'the directory where all the data is stored'
   })
+  .option('introOutro', {
+    alias: 'i',
+    describe: 'adds the intro and the outro'
+  })
   .help()
   .example(`Folder Structure:
   ./data
@@ -40,6 +44,7 @@ const error = (message) => {
 
 const name = args.name
 const dir = args.dir
+const introOutro = args.introOutro
 if (typeof name === 'undefined') error('--name -n is requireed')
 if (typeof dir === 'undefined') error('--dir -d is requireed')
 
@@ -61,5 +66,6 @@ const meta = fs.readdirSync(metaDir)
 module.exports = {
   name,
   dataDir,
-  meta
+  meta,
+  introOutro
 }
