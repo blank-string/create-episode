@@ -14,7 +14,15 @@ const args = yargs
   })
   .option('introOutro', {
     alias: 'i',
-    describe: 'adds the intro and the outro'
+    describe: 'adds the intro and the outro',
+    boolean: true,
+    default: false
+  })
+  .option('keep', {
+    alias: 'k',
+    describe: 'keeps the tmp folder',
+    boolean: true,
+    default: false
   })
   .help()
   .example(`Folder Structure:
@@ -45,6 +53,8 @@ const error = (message) => {
 const name = args.name
 const dir = args.dir
 const introOutro = args.introOutro
+const keep = args.keep
+
 if (typeof name === 'undefined') error('--name -n is requireed')
 if (typeof dir === 'undefined') error('--dir -d is requireed')
 
@@ -56,7 +66,7 @@ if (!fs.existsSync(metaDir)) error(`${metaDir} does not exist`)
 
 const meta = fs.readdirSync(metaDir)
   .map(filename => path.join(metaDir, filename))
-  .filter(filename => filename.includes('.json'))
+  .filter(filename => filename.endsWith('.json'))
   .map(filename => require(filename))
   .map(d => {
     d.file = path.join(metaDir, d.file)
@@ -67,5 +77,6 @@ module.exports = {
   name,
   dataDir,
   meta,
-  introOutro
+  introOutro,
+  keep
 }

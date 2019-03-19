@@ -1,6 +1,6 @@
 const fs = require('fs-extra')
 const path = require('path')
-const { name, dataDir, meta, introOutro } = require('./args')
+const { name, dataDir, meta, introOutro, keep } = require('./args')
 const clean = require('./clean')
 const merge = require('./merge')
 const mergeIntroOutro = require('./merge-intro-outro')
@@ -14,10 +14,19 @@ const createTmp = () => {
 
 const main = async () => {
   const tmp = createTmp()
-  await Promise.all(meta.map(({ name, file, noise, sync }) => clean(tmp, { name, file, noise, sync })))
+
+  meta.forEach(({ file }) => {
+    if (!fs.existsSync(file)) {
+      console.log(`file ${file} does not exist`)
+      process.exit(1)
+    }
+  })
+
+  await Promise.all(meta.map((m) => clean(tmp, m)))
   if (introOutro) await mergeIntroOutro(tmp, name, dataDir, meta)
   else await merge(tmp, name, dataDir, meta)
-  fs.removeSync(tmp)
+
+  if (!keep) fs.removeSync(tmp)
 }
 
 main()

@@ -1,5 +1,7 @@
 const obj = (input) => {
-  const time = toTime(parseInt(input, 10))
+  let time = toTime(parseInt(input, 10))
+  if (typeof input === 'string' && input.includes(':')) time = input
+
   let match = time.trim().split(':')
   if (match.length === 2) match = ['00'].concat(match)
   if (match.length === 1) match = ['00', '00'].concat(match)
