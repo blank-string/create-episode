@@ -5,15 +5,15 @@ const clean = require('./clean')
 const merge = require('./merge')
 const mergeIntroOutro = require('./merge-intro-outro')
 
+const tmp = path.resolve(__dirname, 'tmp')
+
 const createTmp = () => {
-  const tmp = path.resolve(__dirname, 'tmp')
   if (fs.existsSync(tmp)) fs.removeSync(tmp)
   fs.mkdirSync(tmp)
-  return tmp
 }
 
 const main = async () => {
-  const tmp = createTmp()
+  createTmp()
 
   meta.forEach(({ file }) => {
     if (!fs.existsSync(file)) {
