@@ -14,7 +14,7 @@ const args = yargs
   })
   .option('introOutro', {
     alias: 'i',
-    describe: 'adds the intro and the outro',
+    describe: 'ignore adds the intro and the outro',
     boolean: true,
     default: false
   })

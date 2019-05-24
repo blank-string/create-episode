@@ -6,7 +6,6 @@ const timeWizard = require('./time-wizard')
 
 module.exports = async (file) => {
   const command = `soxi -D ${file}`
-  console.log(chalk.green(command))
   const { stdout, stderr } = await exec(command)
   console.log(chalk.blueBright(stdout))
   console.log(chalk.yellow(stderr))

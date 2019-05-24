@@ -23,7 +23,7 @@ const main = async () => {
   })
 
   await Promise.all(meta.map((m) => clean(tmp, m)))
-  if (introOutro) await mergeIntroOutro(tmp, name, dataDir, meta)
+  if (!introOutro) await mergeIntroOutro(tmp, name, dataDir, meta)
   else await merge(tmp, name, dataDir, meta)
 
   if (!keep) fs.removeSync(tmp)
