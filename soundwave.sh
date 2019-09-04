@@ -1,0 +1,1 @@
+ffmpeg -i $1 -lavfi showwavespic=split_channels=1:s=1024x800 $1.png

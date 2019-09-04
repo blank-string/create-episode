@@ -15,7 +15,7 @@ const sox = async (command) => {
 
 const trim = async (tmp, audio, name, start, end = '') => {
   if (end !== '') end = timeWizard.diff(start, end)
-  return sox(`${audio} ${tmp}/${name}.wav trim ${start} ${end}`)
+  return sox(`${audio} ${tmp}/${name}.flac trim ${start} ${end}`)
 }
 
 module.exports = {

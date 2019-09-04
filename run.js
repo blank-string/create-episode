@@ -12,7 +12,7 @@ const intro = path.resolve(__dirname, episode.intro)
 const outro = path.resolve(__dirname, episode.outro)
 
 const clean = () => fs.readdirSync(__dirname).forEach(file => {
-  if (file.endsWith('.wav') || file.endsWith('.prof')) fs.unlinkSync(path.resolve(__dirname, file))
+  if (file.endsWith('.flac') || file.endsWith('.wav') || file.endsWith('.prof')) fs.unlinkSync(path.resolve(__dirname, file))
 })
 
 const convert = ({ name, noise, clap, end }) => new Promise((resolve, reject) => {
@@ -25,7 +25,7 @@ const convert = ({ name, noise, clap, end }) => new Promise((resolve, reject) =>
 })
 
 const merge = () => new Promise((resolve, reject) => {
-  const mergeName = episode.podcasters.reduce((current, name) => `${current} ${episode.name}-${name}-clipped.wav`, '')
+  const mergeName = episode.podcasters.reduce((current, name) => `${current} ${episode.name}-${name}-clipped.flac`, '')
   child_process.execFile('./merge.sh', [episode.name, mergeName, start, intro, outro, intro.split('.')[0], outro.split('.')[0]], (err, stdout, stderr) => {
     if (err) console.log('err', err)
     if (stderr) console.log('stderr', stderr)

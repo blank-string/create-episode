@@ -4,13 +4,13 @@ const length = require('./length')
 const timeWizard = require('./time-wizard')
 
 const mergeTracks = async (tmp, name, meta) => {
-  const trimmedFiles = meta.map(({ name }) => path.resolve(tmp, `${name}-cleaned-trimmed-48000.wav`)).join(' ')
-  return sox(`-m ${trimmedFiles} ${tmp}/${name}-merged.wav`)
+  const trimmedFiles = meta.map(({ name }) => path.resolve(tmp, `${name}-cleaned-trimmed-48000.flac`)).join(' ')
+  return sox(`-m ${trimmedFiles} ${tmp}/${name}-merged.flac`)
 }
 
-const monoNormalize = async (tmp, name) => sox(`${tmp}/${name}-merged.wav ${tmp}/${name}-mono-norm.wav remix 1 norm -3 highpass 10`)
+const monoNormalize = async (tmp, name) => sox(`${tmp}/${name}-merged.flac ${tmp}/${name}-mono-norm.flac remix 1 norm -3 highpass 10`)
 
-const sampleRate = async (input, output) => sox(`${input} -r 48000 ${output}`)
+const sampleRate = async (input, output) => sox(`${input} -r 48000 -b 24 ${output}`)
 
 module.exports = async (tmp, name, dataDir, meta) => {
   await mergeTracks(tmp, name, meta)
@@ -22,21 +22,21 @@ module.exports = async (tmp, name, dataDir, meta) => {
     const sync = hasStart[0].sync
     start = timeWizard.diff(preSyncStart, sync)
   }
-  await trim(tmp, `${tmp}/${name}-mono-norm.wav`, `${name}-mono-norm-trimmed`, start)
+  await trim(tmp, `${tmp}/${name}-mono-norm.flac`, `${name}-mono-norm-trimmed`, start)
 
   let intro = meta.filter(m => 'intro' in m)[0].intro.file
   intro = path.join(dataDir, `audio/${intro}`)
-  await sampleRate(intro, `${tmp}/intro-48000.wav`)
-  intro = `${tmp}/intro-48000.wav`
+  await sampleRate(intro, `${tmp}/intro-48000.flac`)
+  intro = `${tmp}/intro-48000.flac`
   const introLength = await length(intro)
-  await sox(`${tmp}/${name}-mono-norm-trimmed.wav ${tmp}/${name}-mono-norm-trimmed-pad.wav pad ${introLength.time}`)
-  await sox(`-m ${intro} ${tmp}/${name}-mono-norm-trimmed-pad.wav ${tmp}/${name}-intro.wav`)
+  await sox(`${tmp}/${name}-mono-norm-trimmed.flac ${tmp}/${name}-mono-norm-trimmed-pad.flac pad ${introLength.time}`)
+  await sox(`-m ${intro} ${tmp}/${name}-mono-norm-trimmed-pad.flac ${tmp}/${name}-intro.flac`)
 
-  const paddedIntroLength = await length(`${tmp}/${name}-intro.wav`)
+  const paddedIntroLength = await length(`${tmp}/${name}-intro.flac`)
   let outro = meta.filter(m => 'outro' in m)[0].outro.file
   outro = path.join(dataDir, `audio/${outro}`)
-  await sox(`${outro} ${tmp}/outro-padded.wav pad ${paddedIntroLength.time}`)
-  await sampleRate(`${tmp}/outro-padded.wav`, `${tmp}/outro-48000.wav`)
-  await sox(`-m ${tmp}/${name}-intro.wav ${tmp}/outro-48000.wav ${tmp}/${name}-intro-outro.wav`)
-  await sox(`${tmp}/${name}-intro-outro.wav ${dataDir}/${name}.mp3 remix 1 norm -3 highpass 10`)
+  await sox(`${outro} ${tmp}/outro-padded.flac pad ${paddedIntroLength.time}`)
+  await sampleRate(`${tmp}/outro-padded.flac`, `${tmp}/outro-48000.flac`)
+  await sox(`-m ${tmp}/${name}-intro.flac ${tmp}/outro-48000.flac ${tmp}/${name}-intro-outro.flac`)
+  await sox(`${tmp}/${name}-intro-outro.flac ${dataDir}/${name}.mp3 remix 1 norm -3 highpass 10`)
 }
