@@ -3,13 +3,12 @@
 ```sh
 sudo apt-get install -y ffmpeg sox
 pip install -r requirements
-FILENAME=... python src/auto.py
+FOLDER=... python main.py
 ```
 
 ## TODO
 
-* Auto all the files
-* Merge all the things together
-* Override clap time
+* Replace as much sox as possible with pydub
 * Add beginning and ending
-* Remove the slience from the ending
+* Override clap time
+* Remove the slience from the ending and remove up to when someone first talks after clap
