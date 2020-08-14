@@ -16,7 +16,6 @@ def auto(filename):
     profile_filename = '{}/{}.prof'.format(dir, name)
     post_silence = '{}/{}-post-silence.{}'.format(dir, name, extension)
     post_high_pass = '{}/{}-post-high-pass.{}'.format(dir, name, extension)
-    post_compand = '{}/{}-post-compand.{}'.format(dir, name, extension)
     trimmed = '{}/{}-trimmed.{}'.format(dir, name, extension)
     done = '{}/{}-done.{}'.format(dir, name, extension)
 
@@ -65,12 +64,16 @@ def auto(filename):
     print('cleaning', filename)
     sound = AudioSegment.from_file(filename, format=extension)
     print('loaded file')
+
     sound = sound.set_frame_rate(44100)
     print('set frame rate')
+
     sound = effects.normalize(sound, 0)
     print('normailized')
+
     sound = sound.set_channels(1)
     print('single channel')
+
     sound.export(pre_silence, format=extension)
     extract_silence(sound)
     print('extracted silence')
@@ -78,6 +81,7 @@ def auto(filename):
     os.remove(silence_filename)
     exec('sox {} {} noisered {} 0.25'.format(pre_silence, post_silence, profile_filename))
     print('removed silence')
+
     os.remove(pre_silence)
     os.remove(profile_filename)
     sound = AudioSegment.from_file(post_silence, format=extension)
@@ -85,12 +89,10 @@ def auto(filename):
     sound = effects.high_pass_filter(sound, 100)
     sound.export(post_high_pass, format=extension)
     print('hidh pass filter')
-    exec('sox {} {} compand 0.05,0.2 6:-54,-90,-36,-36,-24,-24,0,-12 0 -90 0.1'.format(post_high_pass, post_compand))
+
+    time = clap(post_high_pass)
+    exec('sox {} -c 1 {} trim {}'.format(post_high_pass, trimmed, time))
     os.remove(post_high_pass)
-    time = clap(post_compand)
-    print('compand')
-    exec('sox {} -c 1 {} trim {}'.format(post_compand, trimmed, time))
-    os.remove(post_compand)
     print('trimmed start')
     os.rename(trimmed, done)
     print('done', done)
