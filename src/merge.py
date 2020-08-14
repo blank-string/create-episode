@@ -3,16 +3,27 @@ from pydub import AudioSegment
 import soundfile as sf
 
 
-def merge(folder):
-    files = os.listdir(folder)
-    files = [os.path.join(folder, file) for file in files if 'done' in file]
-    sounds = None
-    for file in files:
-        extension = os.path.splitext(file)[1].replace('.', '')
-        sound = AudioSegment.from_file(file, format=extension)
-        os.remove(file)
-        if sounds is None:
-            sounds = sound
+
+def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10):
+    trim_ms = 0
+    assert chunk_size > 0
+    while sound[trim_ms:trim_ms+chunk_size].dBFS < silence_threshold and trim_ms < len(sound):
+        trim_ms += chunk_size
+    return trim_ms
+
+
+
+def merge(folder, sounds):
+    merged = None
+    for sound in sounds:
+        if merged is None:
+            merged = sound
         else:
-            sounds = sounds.overlay(sound, position=0)
-    sounds.export(os.path.join(folder, "merged.flac"), format="flac")
+            merged = merged.overlay(sound, position=0)
+    print('merged')
+    start_trim = detect_leading_silence(merged)
+    end_trim = detect_leading_silence(merged.reverse())
+    duration = len(merged)
+    merged = merged[start_trim:duration-end_trim]
+    merged.export(os.path.join(folder, "merged.flac"), format="flac")
+    print('done', os.path.join(folder, "merged.flac"))

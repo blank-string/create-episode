@@ -16,8 +16,6 @@ def auto(filename):
     profile_filename = '{}/{}.prof'.format(dir, name)
     post_silence = '{}/{}-post-silence.{}'.format(dir, name, extension)
     post_high_pass = '{}/{}-post-high-pass.{}'.format(dir, name, extension)
-    trimmed = '{}/{}-trimmed.{}'.format(dir, name, extension)
-    done = '{}/{}-done.{}'.format(dir, name, extension)
 
     def exec(bashCommand):
         process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
@@ -57,7 +55,7 @@ def auto(filename):
                 max = d
                 percent = i / samplerate
             i = i + 1
-            if tick >= 15:
+            if tick >= 10:
                 return latest_tick + percent
         return latest_tick + percent
 
@@ -91,8 +89,7 @@ def auto(filename):
     print('hidh pass filter')
 
     time = clap(post_high_pass)
-    exec('sox {} -c 1 {} trim {}'.format(post_high_pass, trimmed, time))
+    time =round(time * 1000) + 1000
     os.remove(post_high_pass)
-    print('trimmed start')
-    os.rename(trimmed, done)
-    print('done', done)
+    sound = sound[time:len(sound)]
+    return sound
