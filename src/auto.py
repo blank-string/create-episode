@@ -1,9 +1,10 @@
+import os
+import subprocess
+
+import pydub
 from pydub import AudioSegment, effects
 from pydub.playback import play
-import pydub
-import subprocess
-import os
-import soundfile as sf
+
 
 def auto(filename):
     dir = os.path.dirname(filename)
@@ -15,14 +16,12 @@ def auto(filename):
     silence_filename = '{}/{}-silence.{}'.format(dir, name, extension)
     profile_filename = '{}/{}.prof'.format(dir, name)
     post_silence = '{}/{}-post-silence.{}'.format(dir, name, extension)
-    post_high_pass = '{}/{}-post-high-pass.{}'.format(dir, name, extension)
 
     def exec(bashCommand):
         process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
         if not error is None:
             print(error)
-
 
     def extract_silence(sound):
         ranges = pydub.silence.detect_silence(
@@ -39,8 +38,7 @@ def auto(filename):
         silence = sound[(largest_range[0] + 100):(largest_range[1] - 100)]
         silence.export(silence_filename, format=extension)
 
-    def clap(path):
-        data, samplerate = sf.read(path)
+    def clap(data, samplerate):
         i = 0
         tick = 0
         max = 0
@@ -77,7 +75,8 @@ def auto(filename):
     print('extracted silence')
     exec('sox {} -n noiseprof {}'.format(silence_filename, profile_filename))
     os.remove(silence_filename)
-    exec('sox {} {} noisered {} 0.25'.format(pre_silence, post_silence, profile_filename))
+    exec('sox {} {} noisered {} 0.25'.format(
+        pre_silence, post_silence, profile_filename))
     print('removed silence')
 
     os.remove(pre_silence)
@@ -85,11 +84,10 @@ def auto(filename):
     sound = AudioSegment.from_file(post_silence, format=extension)
     os.remove(post_silence)
     sound = effects.high_pass_filter(sound, 100)
-    sound.export(post_high_pass, format=extension)
     print('hidh pass filter')
 
-    time = clap(post_high_pass)
-    time =round(time * 1000) + 1000
-    os.remove(post_high_pass)
-    sound = sound[time:len(sound)]
-    return sound
+    s = sound[0:10000]
+    samples = s.get_array_of_samples()
+    time = clap(samples, sound.frame_rate)
+    time = round(time * 1000) + 1000
+    return sound[time:len(sound)]

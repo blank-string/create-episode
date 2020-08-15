@@ -1,7 +1,6 @@
 import os
-from pydub import AudioSegment
-import soundfile as sf
 
+from pydub import AudioSegment
 
 
 def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10):
@@ -10,7 +9,6 @@ def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10):
     while sound[trim_ms:trim_ms+chunk_size].dBFS < silence_threshold and trim_ms < len(sound):
         trim_ms += chunk_size
     return trim_ms
-
 
 
 def merge(folder, sounds):
