@@ -22,6 +22,4 @@ def merge(folder, sounds):
     start_trim = detect_leading_silence(merged)
     end_trim = detect_leading_silence(merged.reverse())
     duration = len(merged)
-    merged = merged[start_trim:duration-end_trim]
-    merged.export(os.path.join(folder, "merged.flac"), format="flac")
-    print('done', os.path.join(folder, "merged.flac"))
+    return merged[start_trim:duration-end_trim]
