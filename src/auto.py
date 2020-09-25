@@ -4,6 +4,7 @@ import subprocess
 import pydub
 from pydub import AudioSegment, effects
 from pydub.playback import play
+from src.clap import clap
 
 
 def exec(bashCommand):
@@ -13,29 +14,9 @@ def exec(bashCommand):
         print(error)
 
 
-def clap(data, samplerate):
-    i = 0
-    tick = 0
-    max = 0
-    latest_tick = 0
-    percent = 0
-    for d in data:
-        if i > samplerate:
-            i = 0
-            tick = tick + 1
-        if d > max:
-            latest_tick = tick
-            max = d
-            percent = i / samplerate
-        i = i + 1
-        if tick >= 10:
-            return latest_tick + percent
-    return latest_tick + percent
-
-
-def extract_silence(sound):
+def extract_silence(sound, silence_thresh=-50):
     ranges = pydub.silence.detect_silence(
-        sound[0:60 * 1000], silence_thresh=-50)
+        sound[0:60 * 1000], silence_thresh=silence_thresh)
 
     largest_diff = 0
     largest_range = []
@@ -45,6 +26,8 @@ def extract_silence(sound):
             largest_diff = diff
             largest_range = r
 
+    if len(largest_range) < 2:
+        return extract_silence(sound, silence_thresh - 1)
     return sound[(largest_range[0] + 100):(largest_range[1] - 100)]
 
 
@@ -89,8 +72,5 @@ def auto(filename) -> AudioSegment:
     sound = effects.high_pass_filter(sound, 100)
     print(name, 'high pass filter')
 
-    s = sound[0:10000]
-    samples = s.get_array_of_samples()
-    time = clap(samples, sound.frame_rate)
-    time = round(time * 1000) + 1000
+    time = clap(sound)
     return sound[time:len(sound)]
