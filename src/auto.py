@@ -54,8 +54,7 @@ def auto(filename) -> AudioSegment:
     os.remove(profile_filename)
     sound = AudioSegment.from_file(post_silence, format=extension)
     os.remove(post_silence)
-    # sound = effects.high_pass_filter(sound, 100)
-    # print(name, 'high pass filter')
 
     time = clap(sound)
+    print(name, 'sync at', time)
     return sound[time:len(sound)]
