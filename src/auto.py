@@ -4,7 +4,9 @@ import subprocess
 import pydub
 from pydub import AudioSegment, effects
 from pydub.playback import play
+
 from src.clap import clap
+from src.extract_silence import extract_silence
 
 
 def exec(bashCommand):
@@ -12,23 +14,6 @@ def exec(bashCommand):
     output, error = process.communicate()
     if not error is None:
         print(error)
-
-
-def extract_silence(sound, silence_thresh=-50):
-    ranges = pydub.silence.detect_silence(
-        sound[0:60 * 1000], silence_thresh=silence_thresh)
-
-    largest_diff = 0
-    largest_range = []
-    for r in ranges:
-        diff = r[1] - r[0]
-        if diff > largest_diff:
-            largest_diff = diff
-            largest_range = r
-
-    if len(largest_range) < 2:
-        return extract_silence(sound, silence_thresh - 1)
-    return sound[(largest_range[0] + 100):(largest_range[1] - 100)]
 
 
 def auto(filename) -> AudioSegment:
@@ -56,7 +41,7 @@ def auto(filename) -> AudioSegment:
     print(name, 'single channel')
 
     sound.export(pre_silence, format=extension)
-    silence = extract_silence(sound)
+    silence = extract_silence(name, sound)
     silence.export(silence_filename, format=extension)
     print(name, 'extracted silence')
     exec('sox {} -n noiseprof {}'.format(silence_filename, profile_filename))
@@ -69,8 +54,8 @@ def auto(filename) -> AudioSegment:
     os.remove(profile_filename)
     sound = AudioSegment.from_file(post_silence, format=extension)
     os.remove(post_silence)
-    sound = effects.high_pass_filter(sound, 100)
-    print(name, 'high pass filter')
+    # sound = effects.high_pass_filter(sound, 100)
+    # print(name, 'high pass filter')
 
     time = clap(sound)
     return sound[time:len(sound)]
